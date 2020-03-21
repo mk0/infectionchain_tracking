@@ -11,12 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import de.chaintracker.aspect.Secured;
 import de.chaintracker.dto.UserCreateDto;
 import de.chaintracker.dto.UserDto;
 import de.chaintracker.entity.User;
 import de.chaintracker.repo.UserRepository;
-import de.chaintracker.util.Utils;
+import de.chaintracker.security.aspect.Secured;
 
 /**
  * @author Marko Voß
@@ -31,9 +30,6 @@ public class UserController {
 
   @Autowired
   private PasswordEncoder passwordEncoder;
-
-  @Autowired
-  private Utils utils;
 
   @Secured
   @RequestMapping(method = RequestMethod.GET)
@@ -63,4 +59,9 @@ public class UserController {
     return user.getId();
   }
 
+  @Secured
+  @RequestMapping(method = RequestMethod.GET, path = "/qr-code")
+  public String getQrCode(final Authentication authentication) {
+    return this.userRepository.findByEmail(authentication.getName()).get().getQrCode();
+  }
 }

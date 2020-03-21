@@ -66,6 +66,9 @@ public class User {
   @Column(length = 120, nullable = false)
   private String userName;
 
+  @Column(length = 256)
+  private String qrCode;
+
   @PrePersist
   void onPrePersist() {
     if (this.id == null) {

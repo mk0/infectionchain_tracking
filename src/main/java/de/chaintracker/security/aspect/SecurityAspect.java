@@ -1,7 +1,7 @@
 /**
  *
  */
-package de.chaintracker.aspect;
+package de.chaintracker.security.aspect;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
