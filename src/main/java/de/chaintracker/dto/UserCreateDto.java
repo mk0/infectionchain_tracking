@@ -3,9 +3,9 @@
  */
 package de.chaintracker.dto;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
 
@@ -17,11 +17,23 @@ import lombok.Data;
 @Builder
 public class UserCreateDto {
 
-  @NotNull
-  @Valid
-  private UserDto user;
-
   @NotBlank
   // TODO length?
   private String password;
+
+  @NotNull
+  @Size(max = 250)
+  private String email;
+
+  @NotNull
+  @Size(max = 120)
+  private String firstName;
+
+  @NotNull
+  @Size(max = 250)
+  private String lastName;
+
+  @NotNull
+  @Size(max = 120)
+  private String userName;
 }
