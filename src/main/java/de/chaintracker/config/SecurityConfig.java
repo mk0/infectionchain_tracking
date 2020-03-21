@@ -4,6 +4,7 @@
 package de.chaintracker.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,8 +12,12 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import de.chaintracker.repo.UserRepository;
+import de.chaintracker.security.AuthenticationFilter;
+import de.chaintracker.security.AuthorizationFilter;
 import de.chaintracker.security.CustomAuthenticationProvider;
 import de.chaintracker.security.SecurityConstants;
 
@@ -22,10 +27,16 @@ import de.chaintracker.security.SecurityConstants;
  */
 @Configuration
 @EnableWebSecurity
-public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
   private CustomAuthenticationProvider authProvider;
+
+  @Autowired
+  private UserRepository userRepository;
+
+  @Value("${app.token.secret}")
+  private String tokenSecret;
 
   @Autowired
   public void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
@@ -42,8 +53,18 @@ public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAda
         .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**")
         .permitAll()
         .anyRequest().authenticated()
-        .and()
-        .httpBasic();
+        .and().addFilter(getAuthenticationFilter())
+        .addFilter(new AuthorizationFilter(authenticationManager(), this.tokenSecret)).sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+  }
+
+  public AuthenticationFilter getAuthenticationFilter() throws Exception {
+    final AuthenticationFilter filter = new AuthenticationFilter(
+        authenticationManager(),
+        this.userRepository,
+        this.tokenSecret);
+    filter.setFilterProcessesUrl("/users/login");
+    return filter;
   }
 
   @Bean
