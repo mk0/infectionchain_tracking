@@ -3,6 +3,7 @@
  */
 package de.chaintracker.repo;
 
+import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 import de.chaintracker.entity.User;
 
@@ -12,4 +13,5 @@ import de.chaintracker.entity.User;
  */
 public interface UserRepository extends CrudRepository<User, String> {
 
+  Optional<User> findByEmail(String email);
 }

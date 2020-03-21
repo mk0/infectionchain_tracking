@@ -15,7 +15,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.google.common.hash.Hashing;
 import de.chaintracker.entity.User;
-import de.chaintracker.repo.UserRepository;
 
 /**
  * @author Marko Voß
@@ -42,6 +41,10 @@ public class UserRepositoryTest {
     assertThat(this.userRepository).isNotNull();
   }
 
+  public static void main(final String[] args) {
+    System.out.println(Hashing.sha256().hashString("Hallo123!", StandardCharsets.UTF_8).toString());
+  }
+
   @Test
   void test_userCreation() {
 
@@ -55,6 +58,7 @@ public class UserRepositoryTest {
         .build());
 
     assertThat(this.userRepository.findById(createdUser.getId())).isNotNull();
+    assertThat(this.userRepository.findByEmail(createdUser.getEmail())).isNotNull();
     assertThat(createdUser.getEmailVerificationToken()).isNotNull();
     assertThat(createdUser.getTimestampCreate()).isNotNull();
     assertThat(createdUser.getTimestampUpdate()).isNull();

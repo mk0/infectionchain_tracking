@@ -4,6 +4,7 @@
 package de.chaintracker.entity;
 
 import java.time.OffsetDateTime;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,7 +12,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,7 +44,7 @@ public class UserAddress {
   @Column(length = 250)
   private String country;
 
-  @Column(name = "timestamp_create", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+  @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE", nullable = false, updatable = false)
   private OffsetDateTime timestampCreate;
 
   @Column(name = "timestamp_update", columnDefinition = "TIMESTAMP WITH TIME ZONE")
@@ -62,22 +62,19 @@ public class UserAddress {
   @Column(length = 120)
   private String type;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.DETACH)
   private User userCreate;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = CascadeType.DETACH)
   private User userUpdate;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.REMOVE)
   private User user;
 
   @PrePersist
   void onPrePersist() {
-    setTimestampCreate(OffsetDateTime.now());
-  }
-
-  @PreUpdate
-  void onPreUpdate() {
-    setTimestampUpdate(OffsetDateTime.now());
+    if (this.id == null) {
+      setTimestampCreate(OffsetDateTime.now());
+    }
   }
 }

@@ -10,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,13 +33,13 @@ public class User {
   @Column(updatable = false, nullable = false, unique = true, length = 32)
   private String id;
 
-  @Column(name = "timestamp_create", columnDefinition = "TIMESTAMP WITH TIME ZONE", nullable = false)
+  @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE", nullable = false, updatable = false)
   private OffsetDateTime timestampCreate;
 
-  @Column(name = "timestamp_update", columnDefinition = "TIMESTAMP WITH TIME ZONE", nullable = false)
+  @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
   private OffsetDateTime timestampUpdate;
 
-  @Column(length = 250, nullable = false)
+  @Column(length = 250, nullable = false, unique = true)
   private String email;
 
   @Column(nullable = false)
@@ -72,12 +71,10 @@ public class User {
 
   @PrePersist
   void onPrePersist() {
-    setEmailVerificationToken(UUID.randomUUID().toString());
-    setTimestampCreate(OffsetDateTime.now());
+    if (this.id == null) {
+      setEmailVerificationToken(UUID.randomUUID().toString());
+      setTimestampCreate(OffsetDateTime.now());
+    }
   }
 
-  @PreUpdate
-  void onPreUpdate() {
-    setTimestampUpdate(OffsetDateTime.now());
-  }
 }

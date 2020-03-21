@@ -11,7 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -67,11 +66,7 @@ public class CountryTravelHistory {
 
   @PrePersist
   void onPrePersist() {
-    setTimestampCreate(OffsetDateTime.now());
-  }
-
-  @PreUpdate
-  void onPreUpdate() {
-    setTimestampUpdate(OffsetDateTime.now());
+    if (this.id == null)
+      setTimestampCreate(OffsetDateTime.now());
   }
 }
