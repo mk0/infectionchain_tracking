@@ -19,4 +19,6 @@ public interface UserRepository extends CrudRepository<User, String> {
 
   boolean existsByUserName(String username);
 
+  void deleteByEmailAndEmailVerificationStatus(String email, boolean status);
+
 }

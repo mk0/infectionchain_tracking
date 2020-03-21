@@ -32,6 +32,7 @@ public class MainService {
           .userName("admin")
           .email("markovoss@arcor.de")
           .emailVerificationStatus(true)
+          .emailVerificationToken("SYSTEM")
           .encryptedPassword(this.passwordEncoder.encode("admin123!"))
           .firstName("Marko")
           .lastName("Voss")
