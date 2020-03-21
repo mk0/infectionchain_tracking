@@ -34,7 +34,11 @@ public class LocationEventController {
   @RequestMapping(method = RequestMethod.POST)
   public void post(@RequestBody final LocationEventDto locationEvent, final Authentication authentication) {
 
-    this.locationEventRepository.save(LocationEvent.builder()
+    store(locationEvent, authentication);
+  }
+
+  public LocationEvent store(final LocationEventDto locationEvent, final Authentication authentication) {
+    return this.locationEventRepository.save(LocationEvent.builder()
         .externalId(UUID.randomUUID().toString())
         .latitude(Math.toRadians(locationEvent.getLatitude()))
         .longitude(Math.toRadians(locationEvent.getLongitude()))

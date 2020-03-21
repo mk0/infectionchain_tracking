@@ -55,7 +55,7 @@ public class LocationEvent {
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private User userCreate;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(fetch = FetchType.LAZY, optional = true)
   private User userUpdate;
 
   @PrePersist

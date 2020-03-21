@@ -10,6 +10,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import org.hibernate.annotations.GenericGenerator;
 import lombok.AllArgsConstructor;
@@ -46,7 +47,7 @@ public class ContactEvent {
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private User userCreate;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @ManyToOne(fetch = FetchType.LAZY, optional = true)
   private User userUpdate;
 
   @Column(length = 120)
@@ -58,8 +59,8 @@ public class ContactEvent {
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private User user2;
 
-  @Column(length = 32)
-  private String locationEventId;
+  @OneToOne(fetch = FetchType.LAZY, optional = true)
+  private LocationEvent locationEvent;
 
   @PrePersist
   void onPrePersist() {

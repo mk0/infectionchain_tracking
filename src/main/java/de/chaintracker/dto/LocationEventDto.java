@@ -9,9 +9,6 @@ import lombok.Data;
 @Builder
 public class LocationEventDto {
 
-  @Size(max = 32, min = 32)
-  private String id;
-
   @NotNull
   private Double latitude;
 

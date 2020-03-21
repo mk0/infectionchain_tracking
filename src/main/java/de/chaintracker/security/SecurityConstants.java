@@ -10,6 +10,7 @@ public class SecurityConstants {
   // public static final String TOKEN_SECRET = "jf9i4jgu83nfl0";
   public static final String SIGN_UP_URL = "/users";
   public static final String VERIFICATION_EMAIL_URL = "/users/email-verification";
+  public static final String JWT_CLAIM_USERID = "userId";
 
   public static String getTokenSecret() {
 

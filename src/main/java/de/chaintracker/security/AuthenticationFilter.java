@@ -4,6 +4,7 @@
 package de.chaintracker.security;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Optional;
@@ -11,6 +12,8 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -66,7 +69,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     final String userId = userOp.get().getId();
 
     final Claims claims = Jwts.claims().setSubject(userEmail);
-    claims.put("userId", userId);
+    claims.put(SecurityConstants.JWT_CLAIM_USERID, userId);
 
     final String token = Jwts.builder().setSubject(userEmail)
         .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
@@ -74,6 +77,10 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         .compact();
 
     res.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
+    res.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
+    try (PrintWriter writer = new PrintWriter(res.getOutputStream())) {
+      writer.write(token);
+    }
   }
 
 }
