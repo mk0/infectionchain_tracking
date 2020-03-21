@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author Marko Voß
+ * @deprecated Can be deleted.
  *
  */
 @Data
@@ -23,6 +24,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Deprecated
 public class Location {
 
   @Id

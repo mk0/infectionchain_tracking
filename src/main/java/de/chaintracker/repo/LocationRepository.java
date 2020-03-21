@@ -12,8 +12,9 @@ import de.chaintracker.entity.Location;
 
 /**
  * @author Marko Voß
- *
+ * @deprecated Can be deleted.
  */
+@Deprecated
 public interface LocationRepository extends CrudRepository<Location, Long> {
 
 
