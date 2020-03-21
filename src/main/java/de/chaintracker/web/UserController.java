@@ -4,9 +4,9 @@
 package de.chaintracker.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import de.chaintracker.dto.UserCreateDto;
@@ -28,9 +28,9 @@ public class UserController {
   private PasswordEncoder passwordEncoder;
 
   @GetMapping
-  public UserDto getUser(@PathVariable("userId") final String userId) {
+  public UserDto getUser(final Authentication authentication) {
 
-    return UserDto.fromEntity(this.userRepository.findById(userId).get());
+    return UserDto.fromEntity(this.userRepository.findByEmail(authentication.getName()).get());
   }
 
   @PostMapping
