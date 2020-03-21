@@ -22,8 +22,7 @@ public class DBHelper {
         .encryptedPassword("f9e18e5428fcd197c72869375154f7c830be2729e163def13e0e3574ba6fd3d7")
         .firstName("Max")
         .lastName("Mustermann")
-        .userId("@Max")
-        .userName("max.mustermann")
+        .userName("@Max")
         .build();
   }
 
@@ -33,8 +32,7 @@ public class DBHelper {
         .encryptedPassword("f9e18e5428fcd197c72869375154f7c830be2729e163def13e0e3574ba6fd3d7")
         .firstName("Tim")
         .lastName("Fourir")
-        .userId("@Tim")
-        .userName("tim.fourir")
+        .userName("@Tim")
         .build();
   }
 
@@ -44,8 +42,7 @@ public class DBHelper {
         .encryptedPassword("f9e18e5428fcd197c72869375154f7c830be2729e163def13e0e3574ba6fd3d7")
         .firstName("John")
         .lastName("Doe")
-        .userId("@John")
-        .userName("john.doe")
+        .userName("@John")
         .build();
   }
 

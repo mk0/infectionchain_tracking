@@ -53,8 +53,7 @@ public class UserRepositoryTest {
         .encryptedPassword(Hashing.sha256().hashString("Hallo123!", StandardCharsets.UTF_8).toString())
         .firstName("Max")
         .lastName("Mustermann")
-        .userId("@Max")
-        .userName("max.mustermann")
+        .userName("@Max")
         .build());
 
     assertThat(this.userRepository.findById(createdUser.getId())).isNotNull();

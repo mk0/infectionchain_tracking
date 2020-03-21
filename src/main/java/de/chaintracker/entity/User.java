@@ -63,9 +63,6 @@ public class User {
   @Column(nullable = false)
   private boolean isEnabled;
 
-  @Column(length = 255, nullable = false)
-  private String userId;
-
   @Column(length = 120, nullable = false)
   private String userName;
 
