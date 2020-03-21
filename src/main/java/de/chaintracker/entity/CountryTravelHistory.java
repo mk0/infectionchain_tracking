@@ -10,6 +10,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -62,4 +64,14 @@ public class CountryTravelHistory {
 
   @Column(length = 250)
   private String note;
+
+  @PrePersist
+  void onPrePersist() {
+    setTimestampCreate(OffsetDateTime.now());
+  }
+
+  @PreUpdate
+  void onPreUpdate() {
+    setTimestampUpdate(OffsetDateTime.now());
+  }
 }
