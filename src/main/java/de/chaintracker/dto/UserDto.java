@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /**
  *
  */
@@ -51,10 +50,3 @@ public class UserDto {
         .build();
   }
 }
-=======
-package de.chaintracker.dto;
-
-public class UserDto {
-
-}
->>>>>>> branch 'master' of https://github.com/mk0/infectionchain_tracking
