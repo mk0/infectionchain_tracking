@@ -24,7 +24,7 @@ public class SecurityAspect {
   public Object logExecutionTime(final ProceedingJoinPoint joinPoint) throws Throwable {
 
     final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (!(authentication instanceof UsernamePasswordAuthenticationToken))
+    if (!(authentication instanceof UsernamePasswordAuthenticationToken) || !authentication.isAuthenticated())
       throw new InsufficientAuthenticationException("Authentication required.");
 
     return joinPoint.proceed();
