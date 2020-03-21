@@ -20,7 +20,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(value = {NoSuchElementException.class})
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  public ResponseEntity<String> badRequest(final Exception ex) {
+  public ResponseEntity<String> notFound(final Exception ex) {
     return ResponseEntity.notFound().build();
+  }
+
+  @ExceptionHandler(value = {IllegalArgumentException.class})
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<String> badRequest(final Exception ex) {
+    return ResponseEntity.badRequest().build();
   }
 }
