@@ -33,11 +33,14 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
   @Autowired
   private UserRepository userRepository;
 
-  @Autowired
-  private PasswordEncoder passwordEncoder;
+  private final PasswordEncoder passwordEncoder;
 
   @Value("${app.token.secret}")
   private String tokenSecret;
+
+  public CustomAuthenticationProvider(final PasswordEncoder passwordEncoder) {
+    this.passwordEncoder = passwordEncoder;
+  }
 
   @Override
   public Authentication authenticate(final Authentication authentication) throws AuthenticationException {

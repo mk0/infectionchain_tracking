@@ -30,9 +30,6 @@ import de.chaintracker.security.SecurityConstants;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
-  private CustomAuthenticationProvider authProvider;
-
-  @Autowired
   private UserRepository userRepository;
 
   @Value("${app.token.secret}")
@@ -40,7 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
   public void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
-    auth.authenticationProvider(this.authProvider);
+    auth.authenticationProvider(authenticationProvider(passwordEncoder()));
   }
 
   @Override
@@ -65,6 +62,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.tokenSecret);
     filter.setFilterProcessesUrl("/users/login");
     return filter;
+  }
+
+  @Bean
+  CustomAuthenticationProvider authenticationProvider(final PasswordEncoder passwordEncoder) {
+    return new CustomAuthenticationProvider(passwordEncoder);
   }
 
   @Bean
