@@ -47,6 +47,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .permitAll()
         .antMatchers(HttpMethod.GET, SecurityConstants.VERIFICATION_EMAIL_URL)
         .permitAll()
+        .antMatchers(HttpMethod.GET, "/*.html", "/*.js", "/*.css", "/*.ico", "/assets/**")
+        .permitAll()
         .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**")
         .permitAll()
         .anyRequest().authenticated()
