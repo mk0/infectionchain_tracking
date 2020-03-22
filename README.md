@@ -5,12 +5,12 @@ The backend has been developed using Spring Boot and Java 11.
 
 # Functionality
 
-- User-Registration
-- User-Authentication
-- QR-Code generation for users to scan each other
-- When users scan each other, the geolocation of this scan will be persisted
-- Users can set their health status to 'infected'
-- Users can retrieve locations, which infected users got close to and thereby know, if they may have been infected as well
+- Account management
+- Authentication
+- Creation of QR Code data
+- Connecting accounts based on scanned QR Code data and current geolocations
+- User can mark himself as infected or healthy
+- Other users can evaluate, if their geolocations got close to an infected user within a given period of time
 
 # License
 
