@@ -43,9 +43,11 @@ public interface InfectionRepository extends CrudRepository<Infection, String> {
       + " AND p1.timestampCreate >= :minTime"
       + " AND p2.timestampCreate <= i2.timestamp"
       + " AND p2.timestampCreate >= :minTime"
+      + " AND (p1.timestampCreate >= DATEADD('MINUTE', -:deltaTime, p2.timestampCreate)"
+      + " OR p1.timestampCreate <= DATEADD('MINUTE',  :deltaTime, p2.timestampCreate))"
       + " AND 111.319 * SQRT("
       + "(p2.latitude - p1.latitude)*(p2.latitude - p1.latitude) + "
       + "((p2.longitude - p1.longitude) * COS((p2.latitude + p1.latitude) * 0.00872664626))*"
       + "((p2.longitude - p1.longitude) * COS((p2.latitude + p1.latitude) * 0.00872664626))) <= :distanceKm")
-  List<ContactEvent> findContactEvents(String userId, OffsetDateTime minTime, double distanceKm);
+  List<ContactEvent> findContactEvents(String userId, double distanceKm, int deltaTime, OffsetDateTime minTime);
 }
