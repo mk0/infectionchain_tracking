@@ -14,5 +14,4 @@ public class ContactEventDto {
 
   @NotNull
   private LocationEventDto locationEvent;
-
 }
