@@ -16,6 +16,7 @@ import de.chaintracker.entity.ContactEvent;
 import de.chaintracker.entity.LocationEvent;
 import de.chaintracker.entity.User;
 import de.chaintracker.repo.ContactEventRepository;
+import de.chaintracker.repo.LocationEventRepository;
 import de.chaintracker.repo.UserRepository;
 import de.chaintracker.security.SecurityConstants;
 import de.chaintracker.security.aspect.Secured;
@@ -39,7 +40,7 @@ public class ContactEventController {
    * At this point, we really could utilize the @Service level :)
    */
   @Autowired
-  private LocationEventController locationEventController;
+  private LocationEventRepository locationEventRepository;
 
   @Value("${app.token.secret}")
   private String tokenSecret;
@@ -49,7 +50,13 @@ public class ContactEventController {
   public void post(@RequestBody final ContactEventDto contactEvent, final Authentication authentication) {
 
     final LocationEvent locationEvent =
-        this.locationEventController.store(contactEvent.getLocationEvent(), authentication);
+        this.locationEventRepository.save(LocationEvent.builder()
+            .externalId(UUID.randomUUID().toString())
+            .latitude(Math.toRadians(contactEvent.getLocationEvent().getLatitude()))
+            .longitude(Math.toRadians(contactEvent.getLocationEvent().getLongitude()))
+            .name(contactEvent.getLocationEvent().getName())
+            .userCreate(this.userRepository.findByEmail(authentication.getName()).get())
+            .build());
 
     final String scannedUserId = Jwts.parser().setSigningKey(this.tokenSecret)
         .parseClaimsJws(contactEvent.getScannedQrCode())
