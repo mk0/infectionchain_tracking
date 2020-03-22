@@ -3,7 +3,9 @@
  */
 package de.chaintracker.web;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import de.chaintracker.dto.ContactEventDto;
+import de.chaintracker.dto.ContactEventUserDto;
+import de.chaintracker.dto.LocationEventDto;
 import de.chaintracker.entity.ContactEvent;
 import de.chaintracker.entity.LocationEvent;
 import de.chaintracker.entity.User;
@@ -71,5 +75,23 @@ public class ContactEventController {
         .user2(this.userRepository.findById(scannedUserId).get())
         .userCreate(creator)
         .build());
+  }
+
+  @Secured
+  @RequestMapping(method = RequestMethod.GET)
+  public List<ContactEventUserDto> getContacts(final Authentication authentication) {
+
+    final User user = this.userRepository.findByEmail(authentication.getName()).get();
+    return this.contactEventRepository.findByUser1OrUser2(user, user).stream().map(c -> {
+
+      if (user.getId().equals(c.getUser1().getId()))
+        return ContactEventUserDto.fromEntity(c);
+
+      return ContactEventUserDto.builder()
+          .locationEvent(LocationEventDto.fromEntity(c.getLocationEvent()))
+          .username1(c.getUser2().getUserName())
+          .username2(c.getUser1().getUserName())
+          .build();
+    }).collect(Collectors.toList());
   }
 }
