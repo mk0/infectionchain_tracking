@@ -1,7 +1,16 @@
-# infectionchain_tracking
+# Infection Chain Backend
 
 This is the backend component of the Project Infection Chain (https://devpost.com/software/infection-chain).
 The backend has been developed using Spring Boot and Java 11.
+
+# Functionality
+
+- User-Registration
+- User-Authentication
+- QR-Code generation for users to scan each other
+- When users scan each other, the geolocation of this scan will be persisted
+- Users can set their health status to 'infected'
+- Users can retrieve locations, which infected users got close to and thereby know, if they may have been infected as well
 
 # Licence
 
