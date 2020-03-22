@@ -1,6 +1,6 @@
 package de.chaintracker.dto;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import de.chaintracker.entity.ContactEvent;
 import lombok.Builder;
@@ -10,13 +10,11 @@ import lombok.Data;
 @Builder
 public class ContactEventUserDto {
 
-  @Valid
-  @NotNull
-  private UserDto user1;
+  @NotBlank
+  private String username1;
 
-  @Valid
-  @NotNull
-  private UserDto user2;
+  @NotBlank
+  private String username2;
 
   @NotNull
   private LocationEventDto locationEvent;
@@ -24,8 +22,8 @@ public class ContactEventUserDto {
   public static final ContactEventUserDto fromEntity(final ContactEvent event) {
     return ContactEventUserDto.builder()
         .locationEvent(LocationEventDto.fromEntity(event.getLocationEvent()))
-        .user1(UserDto.fromEntity(event.getUser1()))
-        .user2(UserDto.fromEntity(event.getUser2()))
+        .username1(event.getUser1().getUserName())
+        .username2(event.getUser2().getUserName())
         .build();
   }
 }
