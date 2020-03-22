@@ -91,6 +91,7 @@ public class ContactEventController {
           .locationEvent(LocationEventDto.fromEntity(c.getLocationEvent()))
           .username1(c.getUser2().getUserName())
           .username2(c.getUser1().getUserName())
+          .timestamp(c.getTimestampCreate())
           .build();
     }).collect(Collectors.toList());
   }
