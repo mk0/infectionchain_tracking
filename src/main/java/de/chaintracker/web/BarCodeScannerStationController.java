@@ -96,6 +96,15 @@ public class BarCodeScannerStationController {
     this.stationRepository.save(existingStation);
   }
 
+  @Secured
+  @RequestMapping(method = RequestMethod.DELETE, path = "/{id}")
+  public void deleteStation(
+      @PathVariable("id")
+      final String stationId) {
+
+    this.stationRepository.deleteById(stationId);
+  }
+
   /**
    *
    * @param pageable
