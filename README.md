@@ -5,12 +5,13 @@ The backend has been developed using Spring Boot and Java 11.
 
 # Functionality
 
-- Account management
-- Authentication
+- User account management
+- User authentication
 - Creation of QR Code data
 - Connecting accounts based on scanned QR Code data and current geolocations
 - User can mark himself as infected or healthy
 - Other users can evaluate, if their geolocations got close to an infected user within a given period of time
+- Manage bar code scanner stations to enable non-digital components
 
 # License
 
