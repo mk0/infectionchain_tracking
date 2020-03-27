@@ -33,6 +33,7 @@ public class BarCodeScannerStationDto {
 
   public static final BarCodeScannerStationDto fromEntity(final BarCodeScannerStation station) {
     return BarCodeScannerStationDto.builder()
+        .id(station.getId())
         .latitude(station.getLatitude())
         .longitude(station.getLongitude())
         .name(station.getName())
