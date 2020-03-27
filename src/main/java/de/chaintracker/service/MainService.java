@@ -26,6 +26,7 @@ import de.chaintracker.repo.InfectionRepository;
 import de.chaintracker.repo.LocationEventRepository;
 import de.chaintracker.repo.UserAddressRepository;
 import de.chaintracker.repo.UserRepository;
+import de.chaintracker.util.Geocoord;
 
 /**
  * @author Marko Voß
@@ -282,6 +283,42 @@ public class MainService {
         .build());
 
     LOG.info("Created Infection of User C one week later:\n{}", writer.writeValueAsString(infection));
+
+    final Geocoord a = new Geocoord(48.16726, 11.49628);
+    final Geocoord b = new Geocoord(48.16726, 11.49632);
+
+    this.locationEventRepository.save(LocationEvent.builder()
+        .externalId(UUID.randomUUID().toString())
+        .latitude(a.latitude())
+        .longitude(a.longitude())
+        .name("A")
+        .userCreate(userC)
+        .build());
+
+    this.locationEventRepository.save(LocationEvent.builder()
+        .externalId(UUID.randomUUID().toString())
+        .latitude(b.latitude())
+        .longitude(b.longitude())
+        .name("B")
+        .userCreate(userC)
+        .build());
+
+    final double distance = a.distanceTo(b); // in meters
+
+    LOG.info("Created locations with distance of {} meters", distance);
+
+    LOG.info("Found close locations for this distance:");
+    this.locationEventRepository
+        .findLocations((distance / Geocoord.EARTH_RADIUS) * (distance / Geocoord.EARTH_RADIUS)).stream()
+        .forEach(t -> {
+          t.getFirst().setUserCreate(null);
+          t.getSecond().setUserCreate(null);
+          try {
+            LOG.info(writer.writeValueAsString(t));
+          } catch (final JsonProcessingException e) {
+            e.printStackTrace();
+          }
+        });
   }
 
 }

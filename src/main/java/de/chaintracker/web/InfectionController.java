@@ -18,6 +18,7 @@ import de.chaintracker.entity.Infection;
 import de.chaintracker.entity.User;
 import de.chaintracker.repo.InfectionRepository;
 import de.chaintracker.security.aspect.Secured;
+import de.chaintracker.util.Geocoord;
 import io.swagger.annotations.ApiParam;
 
 /**
@@ -54,7 +55,7 @@ public class InfectionController {
   @Secured
   @RequestMapping(method = RequestMethod.GET, path = "/events")
   public List<ContactEventUserDto> getInfectedLocations(
-      @ApiParam(value = "The maximum distance in kilometers between two locations to search for.")
+      @ApiParam(value = "The maximum distance in meters between two locations to search for. (max. 100 meters)")
       @RequestParam(value = "distance", required = false)
       final Double distance,
       @ApiParam(value = "The maximum amount of days to search backwards from now.")
@@ -67,12 +68,15 @@ public class InfectionController {
 
     final User user = (User) authentication.getDetails();
 
-    final Double distanceX = distance == null ? .6 : distance;
-    final Integer deltaTimeX = deltaTime == null ? 10 : deltaTime;
+    final double distanceX = distance == null ? 10 : distance > 100 ? 100 : distance;
+    final int deltaTimeX = deltaTime == null ? 10 : deltaTime;
     final OffsetDateTime minTimeX =
         maxTime == null ? OffsetDateTime.now().minusDays(14) : OffsetDateTime.now().minusDays(maxTime);
 
-    return this.infectionRepository.findContactEvents(user.getId(), distanceX, deltaTimeX, minTimeX).stream()
+    final double distanceAlpha =
+        (distanceX / Geocoord.EARTH_RADIUS) * (distanceX / Geocoord.EARTH_RADIUS);
+
+    return this.infectionRepository.findContactEvents(user.getId(), distanceAlpha, deltaTimeX, minTimeX).stream()
         .map(ContactEventUserDto::fromEntity).collect(Collectors.toList());
   }
 }

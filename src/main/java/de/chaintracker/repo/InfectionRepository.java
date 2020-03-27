@@ -21,13 +21,16 @@ public interface InfectionRepository extends CrudRepository<Infection, String> {
   boolean findByUserId(String id);
 
   /**
-   * Using euclidean distance approximation for fast distance calculation since the target distances
-   * are very small.
+   * Using spherical Earth projected to a plane for fast calculation.<br/>
+   * https://en.wikipedia.org/wiki/Geographical_distance#Spherical_Earth_projected_to_a_plane
+   *
    *
    * @param userId
    * @param minTime
-   * @param distanceKm
+   * @param distanceAlpha = (distance/earthRadius)²
    * @return
+   *
+   * @see https://en.wikipedia.org/wiki/Geographical_distance#Spherical_Earth_projected_to_a_plane
    */
   // u2 = infected, p2 = locations of u2
   @Query("SELECT DISTINCT c1 FROM LocationEvent p1, LocationEvent p2, User u1, User u2, Infection i2, ContactEvent c1, ContactEvent c2 "
@@ -45,9 +48,8 @@ public interface InfectionRepository extends CrudRepository<Infection, String> {
       + " AND p2.timestampCreate >= :minTime"
       + " AND (p1.timestampCreate >= DATEADD('MINUTE', -:deltaTime, p2.timestampCreate)"
       + " OR p1.timestampCreate <= DATEADD('MINUTE',  :deltaTime, p2.timestampCreate))"
-      + " AND 111.319 * SQRT("
-      + "(p2.latitude - p1.latitude)*(p2.latitude - p1.latitude) + "
-      + "((p2.longitude - p1.longitude) * COS((p2.latitude + p1.latitude) * 0.00872664626))*"
-      + "((p2.longitude - p1.longitude) * COS((p2.latitude + p1.latitude) * 0.00872664626))) <= :distanceKm")
-  List<ContactEvent> findContactEvents(String userId, double distanceKm, int deltaTime, OffsetDateTime minTime);
+      + " AND (p1.latitude - p2.latitude) * (p1.latitude - p2.latitude) + "
+      + " COS((p1.latitude + p2.latitude) / 2) * COS((p1.latitude + p2.latitude) / 2) *"
+      + " (p1.longitude - p2.longitude) * (p1.longitude - p2.longitude) <= :distanceAlpha")
+  List<ContactEvent> findContactEvents(String userId, double distanceAlpha, int deltaTime, OffsetDateTime minTime);
 }
