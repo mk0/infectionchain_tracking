@@ -58,11 +58,11 @@ public class UserController {
   @RequestMapping(method = RequestMethod.GET)
   public UserDto getUser(final Authentication authentication) {
 
-    return UserDto.fromEntity(this.userRepository.findByEmail(authentication.getName()).get());
+    return UserDto.fromEntity((User) authentication.getDetails());
   }
 
   @RequestMapping(method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
-  public String createUser(@RequestBody final UserCreateDto userCreate) {
+  public String createUser(final UserCreateDto userCreate) {
 
     if (this.userRepository.existsByEmail(userCreate.getEmail()))
       throw new IllegalArgumentException("Email does already exist.");
@@ -89,7 +89,8 @@ public class UserController {
   }
 
   @RequestMapping(method = RequestMethod.POST, path = "/email-verification")
-  public void verifyEmail(@RequestBody final String verificationJwt) {
+  public void verifyEmail(@RequestBody
+  final String verificationJwt) {
 
     final Claims claims = Jwts.parser().setSigningKey(this.tokenSecret).parseClaimsJws(verificationJwt).getBody();
     final String email = claims.getSubject();
@@ -111,20 +112,24 @@ public class UserController {
 
     final User user = userOp.get();
     user.setEmailVerificationStatus(true);
+    this.userRepository.save(user);
 
   }
 
   @Secured
   @RequestMapping(method = RequestMethod.GET, path = "/qr-code")
   public String getQrCode(final Authentication authentication) {
-    return this.userRepository.findByEmail(authentication.getName()).get().getQrCode();
+    return ((User) authentication.getDetails()).getQrCode();
   }
 
   @Secured
   @RequestMapping(method = RequestMethod.POST, path = "/address")
-  public void postAddress(@RequestBody final UserAddressDto address, final Authentication authentication) {
+  public void postAddress(
+      @RequestBody
+      final UserAddressDto address,
+      final Authentication authentication) {
 
-    final User user = this.userRepository.findByEmail(authentication.getName()).get();
+    final User user = (User) authentication.getDetails();
 
     final Optional<UserAddress> existingAddressOp =
         this.addressRepository.findByUserIdAndType(user.getId(), address.getType());
@@ -163,7 +168,7 @@ public class UserController {
   @RequestMapping(method = RequestMethod.GET, path = "/address")
   public List<UserAddressDto> getAddresses(final Authentication authentication) {
 
-    final User user = this.userRepository.findByEmail(authentication.getName()).get();
+    final User user = (User) authentication.getDetails();
 
     return this.addressRepository.findByUserId(user.getId()).stream().map(UserAddressDto::fromEntity)
         .collect(Collectors.toList());
@@ -172,7 +177,9 @@ public class UserController {
   @Secured
   @RequestMapping(method = RequestMethod.DELETE, path = "/address/{type}")
   @Transactional
-  public void deleteAddress(@PathVariable("type") final String type) {
+  public void deleteAddress(
+      @PathVariable("type")
+      final String type) {
 
     this.addressRepository.deleteByType(type);
   }

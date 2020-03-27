@@ -4,6 +4,7 @@
 package de.chaintracker.web;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +36,10 @@ import io.jsonwebtoken.Jwts;
 public class ContactEventController {
 
   @Autowired
-  private UserRepository userRepository;
+  private ContactEventRepository contactEventRepository;
 
   @Autowired
-  private ContactEventRepository contactEventRepository;
+  private UserRepository userRepository;
 
   /**
    * At this point, we really could utilize the @Service level :)
@@ -53,27 +54,42 @@ public class ContactEventController {
   @RequestMapping(method = RequestMethod.POST)
   public void post(@RequestBody final ContactEventDto contactEvent, final Authentication authentication) {
 
-    final LocationEvent locationEvent =
-        this.locationEventRepository.save(LocationEvent.builder()
-            .externalId(UUID.randomUUID().toString())
-            .latitude(Math.toRadians(contactEvent.getLocationEvent().getLatitude()))
-            .longitude(Math.toRadians(contactEvent.getLocationEvent().getLongitude()))
-            .name(contactEvent.getLocationEvent().getName())
-            .userCreate(this.userRepository.findByEmail(authentication.getName()).get())
-            .build());
+    /*
+     * Validate scanned userId
+     */
 
     final String scannedUserId = Jwts.parser().setSigningKey(this.tokenSecret)
         .parseClaimsJws(contactEvent.getScannedQrCode())
         .getBody().get(SecurityConstants.JWT_CLAIM_USERID, String.class);
 
-    final User creator = this.userRepository.findByEmail(authentication.getName()).get();
+    final Optional<User> scannedUserOp = this.userRepository.findById(scannedUserId);
+    if (scannedUserOp.isEmpty())
+      throw new IllegalArgumentException("Scanned userId not found.");
+
+    /*
+     * Get current user
+     */
+
+    final User currentUser = (User) authentication.getDetails();
+
+    /*
+     * Store data
+     */
+
+    final LocationEvent locationEvent = this.locationEventRepository.save(LocationEvent.builder()
+        .externalId(UUID.randomUUID().toString())
+        .latitude(Math.toRadians(contactEvent.getLocationEvent().getLatitude()))
+        .longitude(Math.toRadians(contactEvent.getLocationEvent().getLongitude()))
+        .name(contactEvent.getLocationEvent().getName())
+        .userCreate(currentUser)
+        .build());
 
     this.contactEventRepository.save(ContactEvent.builder()
         .externalId(UUID.randomUUID().toString())
         .locationEvent(locationEvent)
-        .user1(creator)
-        .user2(this.userRepository.findById(scannedUserId).get())
-        .userCreate(creator)
+        .user1(currentUser)
+        .user2(scannedUserOp.get())
+        .userCreate(currentUser)
         .build());
   }
 
@@ -81,7 +97,7 @@ public class ContactEventController {
   @RequestMapping(method = RequestMethod.GET)
   public List<ContactEventUserDto> getContacts(final Authentication authentication) {
 
-    final User user = this.userRepository.findByEmail(authentication.getName()).get();
+    final User user = (User) authentication.getDetails();
     return this.contactEventRepository.findByUser1OrUser2(user, user).stream().map(c -> {
 
       if (user.getId().equals(c.getUser1().getId()))

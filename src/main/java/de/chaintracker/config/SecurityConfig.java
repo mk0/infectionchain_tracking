@@ -52,18 +52,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**")
         .permitAll()
         .anyRequest().authenticated()
-        .and().addFilter(getAuthenticationFilter())
-        .addFilter(new AuthorizationFilter(authenticationManager(), this.tokenSecret)).sessionManagement()
+        .and()
+        .addFilter(authenticationFilter())
+        .addFilter(authorizationFilter())
+        .sessionManagement()
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
   }
 
-  public AuthenticationFilter getAuthenticationFilter() throws Exception {
+  public AuthenticationFilter authenticationFilter() throws Exception {
     final AuthenticationFilter filter = new AuthenticationFilter(
         authenticationManager(),
         this.userRepository,
         this.tokenSecret);
     filter.setFilterProcessesUrl("/users/login");
     return filter;
+  }
+
+  public AuthorizationFilter authorizationFilter() throws Exception {
+    return new AuthorizationFilter(authenticationManager(), this.tokenSecret, this.userRepository);
   }
 
   @Bean

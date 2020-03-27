@@ -17,7 +17,6 @@ import de.chaintracker.dto.InfectionDto;
 import de.chaintracker.entity.Infection;
 import de.chaintracker.entity.User;
 import de.chaintracker.repo.InfectionRepository;
-import de.chaintracker.repo.UserRepository;
 import de.chaintracker.security.aspect.Secured;
 import io.swagger.annotations.ApiParam;
 
@@ -32,14 +31,11 @@ public class InfectionController {
   @Autowired
   private InfectionRepository infectionRepository;
 
-  @Autowired
-  private UserRepository userRepository;
-
   @Secured
   @RequestMapping(method = RequestMethod.POST)
   public void setInfected(final InfectionDto infection, final Authentication authentication) {
 
-    final User user = this.userRepository.findByEmail(authentication.getName()).get();
+    final User user = (User) authentication.getDetails();
 
     if (!infection.isInfected() && this.infectionRepository.findByUserId(user.getId())) {
       this.infectionRepository.deleteByUserId(user.getId());
@@ -58,17 +54,18 @@ public class InfectionController {
   @Secured
   @RequestMapping(method = RequestMethod.GET, path = "/events")
   public List<ContactEventUserDto> getInfectedLocations(
-      @ApiParam(value = "The maximum distance in kilometers between two locations to search for.") @RequestParam(
-          value = "distance", required = false) final Double distance,
-      @ApiParam(
-          value = "The maximum amount of days to search backwards from now.") @RequestParam(
-              value = "maxTime", required = false) final Integer maxTime,
-      @ApiParam(
-          value = "The maximum amount of minutes between different users did enter the almost same location.") @RequestParam(
-              value = "deltaTime", required = false) final Integer deltaTime,
+      @ApiParam(value = "The maximum distance in kilometers between two locations to search for.")
+      @RequestParam(value = "distance", required = false)
+      final Double distance,
+      @ApiParam(value = "The maximum amount of days to search backwards from now.")
+      @RequestParam(value = "maxTime", required = false)
+      final Integer maxTime,
+      @ApiParam(value = "The maximum amount of minutes between different users did enter the almost same location.")
+      @RequestParam(value = "deltaTime", required = false)
+      final Integer deltaTime,
       final Authentication authentication) {
 
-    final User user = this.userRepository.findByEmail(authentication.getName()).get();
+    final User user = (User) authentication.getDetails();
 
     final Double distanceX = distance == null ? .6 : distance;
     final Integer deltaTimeX = deltaTime == null ? 10 : deltaTime;
