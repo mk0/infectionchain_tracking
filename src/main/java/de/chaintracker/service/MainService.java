@@ -6,6 +6,8 @@ package de.chaintracker.service;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
+
+import de.chaintracker.producers.UserProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,9 +60,18 @@ public class MainService {
   @Autowired
   private ObjectMapper objectMapper;
 
+  @Autowired
+  private UserProducer userProducer;
+
   @EventListener
   public void onApplicationEvent(final ApplicationStartedEvent event) throws JsonProcessingException {
     createExampleData();
+
+    register();
+  }
+
+  private void register() {
+
   }
 
   private final void createExampleData() throws JsonProcessingException {
@@ -82,6 +93,7 @@ public class MainService {
         .isEnabled(true)
         .build());
 
+
     final UserAddress addressA1 = this.addressRepository.save(UserAddress.builder()
         .addressExternalId(UUID.randomUUID().toString())
         .city("Berlin")
@@ -92,6 +104,7 @@ public class MainService {
         .user(userA)
         .userCreate(userA)
         .build());
+
 
     final UserAddress addressA2 = this.addressRepository.save(UserAddress.builder()
         .addressExternalId(UUID.randomUUID().toString())
@@ -234,6 +247,12 @@ public class MainService {
     /*
      * Location Event User A -> User B on 52.527338, 13.430731: User A scanning User B
      */
+
+    userProducer.send(userA);
+    userProducer.send(userB);
+    userProducer.send(userC);
+    userProducer.send(userD);
+
 
     final LocationEvent locationEventAB = this.locationEventRepository.save(LocationEvent.builder()
         .externalId(UUID.randomUUID().toString())
