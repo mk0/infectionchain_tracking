@@ -5,6 +5,9 @@ package de.chaintracker.service;
 
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import de.chaintracker.entity.ContactEvent;
 import de.chaintracker.entity.Infection;
+import de.chaintracker.entity.InfectionType;
 import de.chaintracker.entity.LocationEvent;
 import de.chaintracker.entity.User;
 import de.chaintracker.entity.UserAddress;
@@ -36,6 +40,8 @@ import de.chaintracker.util.Geocoord;
 public class MainService {
 
   private static final Logger LOG = LoggerFactory.getLogger(MainService.class);
+
+  private static final Random RANDOM = new Random();
 
   @Autowired
   private UserRepository userRepository;
@@ -277,15 +283,55 @@ public class MainService {
 
     final OffsetDateTime infectionTime = OffsetDateTime.now().plus(1, ChronoUnit.WEEKS);
     final Infection infection = this.infectionRepository.save(Infection.builder()
-        .isInfected(true)
+        .infectionType(InfectionType.INFECTED)
         .timestamp(infectionTime)
         .user(userC)
         .build());
 
     LOG.info("Created Infection of User C one week later:\n{}", writer.writeValueAsString(infection));
 
+    this.infectionRepository.save(Infection.builder()
+        .infectionType(InfectionType.AT_RISK)
+        .stage(5)
+        .timestamp(infectionTime)
+        .user(userD)
+        .build());
+
+    this.infectionRepository.save(Infection.builder()
+        .infectionType(InfectionType.AT_RISK)
+        .stage(1)
+        .timestamp(infectionTime)
+        .user(userB)
+        .build());
+
+    this.infectionRepository.save(Infection.builder()
+        .infectionType(InfectionType.HEALTHY)
+        .timestamp(infectionTime)
+        .user(userA)
+        .build());
+
+    createRandomLocations(writer, userA, userB, userC, userD);
+
+    LOG.info("DONE");
+  }
+
+  /**
+   * @param writer
+   * @param userA
+   * @param userC
+   * @param userB
+   * @param userD
+   */
+  private void createRandomLocations(final ObjectWriter writer,
+      final User userA,
+      final User userB,
+      final User userC,
+      final User userD) {
+
     final Geocoord a = new Geocoord(48.16726, 11.49628);
     final Geocoord b = new Geocoord(48.16726, 11.49632);
+
+    // Create at least one match
 
     this.locationEventRepository.save(LocationEvent.builder()
         .externalId(UUID.randomUUID().toString())
@@ -311,14 +357,59 @@ public class MainService {
     this.locationEventRepository
         .findLocations((distance / Geocoord.EARTH_RADIUS) * (distance / Geocoord.EARTH_RADIUS)).stream()
         .forEach(t -> {
-          t.getFirst().setUserCreate(null);
-          t.getSecond().setUserCreate(null);
+          t.getFirst().setUserCreate(null); // we do not have a session at this application event
+          t.getSecond().setUserCreate(null); // we do not have a session at this application event
           try {
             LOG.info(writer.writeValueAsString(t));
           } catch (final JsonProcessingException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
           }
         });
+
+
+    final int amount = 100000;
+
+    LOG.info("Creating {} amount of LocationEvents around location {}", amount, a);
+
+    final List<LocationEvent> buffer = new ArrayList<>(100);
+
+    final OffsetDateTime start = OffsetDateTime.now();
+
+    for (int i = 1; i <= amount; i++) {
+
+      final Geocoord randCoord = new Geocoord(
+          getRandom(a.getLatitudeDecimal()),
+          getRandom(a.getLongitudeDecimal()));
+
+      buffer.add(LocationEvent.builder()
+          .externalId(UUID.randomUUID().toString())
+          .latitude(randCoord.latitude())
+          .longitude(randCoord.longitude())
+          .name("RANDOM-" + i)
+          .userCreate(
+              RANDOM.nextBoolean() ? userA : RANDOM.nextBoolean() ? userB : RANDOM.nextBoolean() ? userC : userD)
+          .build());
+
+      if (OffsetDateTime.now().isAfter(start.plusMinutes(5))) {
+        LOG.info("Cancelling (timeout after 5 minutes). Storing {} into DB.", buffer.size());
+        this.locationEventRepository.saveAll(buffer);
+        buffer.clear();
+        break;
+      }
+
+
+      if (i % 10000 == 0) {
+        LOG.info("Storing {} into DB.", buffer.size());
+        this.locationEventRepository.saveAll(buffer);
+        buffer.clear();
+      }
+
+      if ((i * 100. / amount) % 10 == 0 && (i * 100. / amount) != 0)
+        LOG.info("{}% done", (int) (i * 100. / amount));
+    }
   }
 
+  private static final double getRandom(final double position) {
+    return position + RANDOM.nextInt(100000) / 1000000.0;
+  }
 }

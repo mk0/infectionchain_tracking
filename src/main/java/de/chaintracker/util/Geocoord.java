@@ -77,4 +77,9 @@ public class Geocoord {
 
     System.out.println(a.distanceTo(b));
   }
+
+  @Override
+  public String toString() {
+    return "[" + this.latitudeDecimal + ", " + this.longitudeDecimal + "]";
+  }
 }

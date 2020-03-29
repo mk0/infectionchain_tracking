@@ -42,14 +42,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(final HttpSecurity http) throws Exception {
-    http.cors().and().csrf().disable().authorizeRequests()
+    http.cors().and().csrf().disable()
+        .authorizeRequests()
         .antMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL)
         .permitAll()
         .antMatchers(HttpMethod.GET, SecurityConstants.VERIFICATION_EMAIL_URL)
         .permitAll()
         .antMatchers(HttpMethod.GET, "/*.html", "/*.js", "/*.css", "/*.ico", "/assets/**")
         .permitAll()
-        .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**")
+        .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**", "/h2-console/**")
         .permitAll()
         .anyRequest().authenticated()
         .and()
@@ -57,6 +58,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .addFilter(authorizationFilter())
         .sessionManagement()
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    http.headers().frameOptions().disable();
   }
 
   public AuthenticationFilter authenticationFilter() throws Exception {

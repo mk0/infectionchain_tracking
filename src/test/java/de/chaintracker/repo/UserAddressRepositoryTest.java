@@ -8,12 +8,16 @@ import java.time.OffsetDateTime;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.sql.DataSource;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import de.chaintracker.config.TestConfig;
 import de.chaintracker.entity.User;
 import de.chaintracker.entity.UserAddress;
 
@@ -23,6 +27,7 @@ import de.chaintracker.entity.UserAddress;
  */
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
+@Import(TestConfig.class)
 public class UserAddressRepositoryTest {
 
   @Autowired
@@ -35,24 +40,27 @@ public class UserAddressRepositoryTest {
   private UserAddressRepository addressRepository;
   @Autowired
   private UserRepository userRepository;
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
-  @Test
+  @BeforeEach
   void injectedComponentsAreNotNull() {
     assertThat(this.dataSource).isNotNull();
     assertThat(this.jdbcTemplate).isNotNull();
     assertThat(this.entityManager).isNotNull();
     assertThat(this.addressRepository).isNotNull();
     assertThat(this.userRepository).isNotNull();
+    assertThat(this.passwordEncoder).isNotNull();
   }
 
   @Test
   void test_addressCreation() {
 
-    this.userRepository.save(DBHelper.getUserMaxMustermann());
-    final Optional<User> userMax = this.userRepository.findByEmail(DBHelper.getUserMaxMustermann().getEmail());
+    this.userRepository.save(DataHelper.getUserMaxMustermann());
+    final Optional<User> userMax = this.userRepository.findByEmail(DataHelper.getUserMaxMustermann().getEmail());
     assertThat(userMax).isNotEmpty();
 
-    final UserAddress address1 = DBHelper.getAddressAlexanderplatz();
+    final UserAddress address1 = DataHelper.getAddressAlexanderplatz();
     address1.setUser(userMax.get());
     address1.setUserCreate(userMax.get());
 
@@ -63,11 +71,11 @@ public class UserAddressRepositoryTest {
     assertThat(createdAddress1.getTimestampUpdate()).isNull();
 
     // Check ManyToOne
-    this.userRepository.save(DBHelper.getUserTimFourir());
-    final Optional<User> userTim = this.userRepository.findByEmail(DBHelper.getUserTimFourir().getEmail());
+    this.userRepository.save(DataHelper.getUserTimFourir());
+    final Optional<User> userTim = this.userRepository.findByEmail(DataHelper.getUserTimFourir().getEmail());
     assertThat(userTim).isNotEmpty();
 
-    final UserAddress address2 = DBHelper.getAddressSophienkirche();
+    final UserAddress address2 = DataHelper.getAddressSophienkirche();
     address2.setUser(userMax.get());
     address2.setUserCreate(userTim.get());
 
@@ -86,23 +94,23 @@ public class UserAddressRepositoryTest {
      * Create users
      */
 
-    this.userRepository.save(DBHelper.getUserMaxMustermann());
-    final Optional<User> userMax = this.userRepository.findByEmail(DBHelper.getUserMaxMustermann().getEmail());
+    this.userRepository.save(DataHelper.getUserMaxMustermann());
+    final Optional<User> userMax = this.userRepository.findByEmail(DataHelper.getUserMaxMustermann().getEmail());
     assertThat(userMax).isNotEmpty();
 
-    this.userRepository.save(DBHelper.getUserTimFourir());
-    final Optional<User> userTim = this.userRepository.findByEmail(DBHelper.getUserTimFourir().getEmail());
+    this.userRepository.save(DataHelper.getUserTimFourir());
+    final Optional<User> userTim = this.userRepository.findByEmail(DataHelper.getUserTimFourir().getEmail());
     assertThat(userTim).isNotEmpty();
 
-    this.userRepository.save(DBHelper.getUserJohnDoe());
-    final Optional<User> userJohn = this.userRepository.findByEmail(DBHelper.getUserJohnDoe().getEmail());
+    this.userRepository.save(DataHelper.getUserJohnDoe());
+    final Optional<User> userJohn = this.userRepository.findByEmail(DataHelper.getUserJohnDoe().getEmail());
     assertThat(userTim).isNotEmpty();
 
     /*
      * Create and update address
      */
 
-    final UserAddress address = DBHelper.getAddressAlexanderplatz();
+    final UserAddress address = DataHelper.getAddressAlexanderplatz();
     address.setUser(userMax.get());
     address.setUserCreate(userTim.get());
 

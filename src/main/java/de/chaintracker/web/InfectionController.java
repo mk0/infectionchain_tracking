@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import de.chaintracker.dto.ContactEventUserDto;
 import de.chaintracker.dto.InfectionDto;
 import de.chaintracker.entity.Infection;
+import de.chaintracker.entity.InfectionType;
 import de.chaintracker.entity.User;
 import de.chaintracker.repo.InfectionRepository;
 import de.chaintracker.security.aspect.Secured;
@@ -44,7 +45,7 @@ public class InfectionController {
     }
 
     this.infectionRepository.save(Infection.builder()
-        .isInfected(true)
+        .infectionType(InfectionType.INFECTED)
         .timestamp(OffsetDateTime.now())
         .user(user)
         .build());

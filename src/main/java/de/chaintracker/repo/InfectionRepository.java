@@ -37,7 +37,7 @@ public interface InfectionRepository extends CrudRepository<Infection, String> {
       + "WHERE u1.id = :userId"
       + " AND u2.id <> :userId"
       + " AND u2.id = i2.user.id"
-      + " AND i2.isInfected = true"
+      + " AND i2.infectionType = 'INFECTED'"
       + " AND (c1.user1.id = :userId OR c1.user2.id = :userId)"
       + " AND (c1.locationEvent.id = p1.id)"
       + " AND (c2.user1.id = u2.id OR c2.user2.id = u2.id)"
