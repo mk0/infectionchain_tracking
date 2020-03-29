@@ -13,7 +13,7 @@ public class UserInfectedSenderConfig extends UserSenderConfig {
 
     @Bean
     public ProducerFactory<String, UserInfected> userInfectedProducerFactory() {
-        return new DefaultKafkaProducerFactory<>(producerConfigs());
+        return new DefaultKafkaProducerFactory<>(userSenderConfig());
     }
 
 

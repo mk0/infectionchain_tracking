@@ -19,7 +19,7 @@ import java.util.Map;
 public class UserGotScannedSenderConfig  extends UserSenderConfig {
     @Bean
     public ProducerFactory<String, UserGotScanned> userGotScannedProducerFactory() {
-        return new DefaultKafkaProducerFactory<>(producerConfigs());
+        return new DefaultKafkaProducerFactory<>(userSenderConfig());
     }
 
 

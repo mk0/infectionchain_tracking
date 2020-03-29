@@ -23,7 +23,7 @@ public class UserCreatedSenderConfig  extends UserSenderConfig {
 
     @Bean
     public ProducerFactory<String, UserCreated> userCreatedProducerFactory() {
-        return new DefaultKafkaProducerFactory<>(producerConfigs());
+        return new DefaultKafkaProducerFactory<>(userSenderConfig());
     }
 
     @Bean
