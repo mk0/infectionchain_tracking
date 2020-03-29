@@ -7,14 +7,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-@KafkaListener(topics = "users",
-        containerFactory = "userCreatedKafkaListenerContainerFactory")
+@Service
 class UserCreatedConsumer {
 
     private static final Logger LOG = LoggerFactory.getLogger(MainService.class);
 
 
-
+    @KafkaListener(topics = "users",
+            containerFactory = "userCreatedKafkaListenerContainerFactory")
     public void userCreatedListener(UserCreated userCreated) {
 
         LOG.info("!!!user created!!!");
