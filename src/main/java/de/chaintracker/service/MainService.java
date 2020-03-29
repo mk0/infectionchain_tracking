@@ -329,10 +329,6 @@ public class MainService {
           }
         });
 
-    var update = new UserUpdated();
-    update.id = userA.getId();
-    update.email = userA.getEmail();
-    userProducer.userUpdated(update);
   }
 
 }
