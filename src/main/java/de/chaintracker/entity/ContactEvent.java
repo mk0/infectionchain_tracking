@@ -67,4 +67,16 @@ public class ContactEvent {
     if (this.id == null)
       setTimestampCreate(OffsetDateTime.now());
   }
+
+  public User getUser1() {
+    return user1;
+  }
+
+  public User getUser2() {
+    return user2;
+  }
+
+  public LocationEvent getLocationEvent() {
+    return locationEvent;
+  }
 }

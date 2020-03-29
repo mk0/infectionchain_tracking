@@ -77,4 +77,13 @@ public class Geocoord {
 
     System.out.println(a.distanceTo(b));
   }
+
+
+  public double getLatitudeDecimal() {
+    return latitudeDecimal;
+  }
+
+  public double getLongitudeDecimal() {
+    return longitudeDecimal;
+  }
 }

@@ -7,7 +7,11 @@ import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
-import de.chaintracker.producers.UserProducer;
+import de.chaintracker.events.UserGotScanned;
+import de.chaintracker.producers.UserCreatedProducer;
+import de.chaintracker.producers.UserGotScannedProducer;
+import de.chaintracker.producers.UserLocatedProducer;
+import de.chaintracker.producers.UserScannedProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +65,17 @@ public class MainService {
   private ObjectMapper objectMapper;
 
   @Autowired
-  private UserProducer userProducer;
+  private UserCreatedProducer userCreated;
+
+  @Autowired
+  private UserScannedProducer userScanned;
+
+  @Autowired
+  private UserLocatedProducer userLocated;
+
+  @Autowired
+  private UserGotScannedProducer userGotScanned;
+
 
   @EventListener
   public void onApplicationEvent(final ApplicationStartedEvent event) throws JsonProcessingException {
@@ -240,6 +254,12 @@ public class MainService {
         .userCreate(userB)
         .build());
 
+
+    userCreated.send(userA);
+    userCreated.send(userB);
+    userCreated.send(userC);
+    userCreated.send(userD);
+
     LOG.info("Created User D:\n{}", writer.writeValueAsString(userD));
     LOG.info("Created User D Address HOME:\n{}", writer.writeValueAsString(addressD1));
     LOG.info("Created User D Address WORK:\n{}", writer.writeValueAsString(addressD2));
@@ -248,10 +268,6 @@ public class MainService {
      * Location Event User A -> User B on 52.527338, 13.430731: User A scanning User B
      */
 
-    userProducer.send(userA);
-    userProducer.send(userB);
-    userProducer.send(userC);
-    userProducer.send(userD);
 
 
     final LocationEvent locationEventAB = this.locationEventRepository.save(LocationEvent.builder()
@@ -272,6 +288,8 @@ public class MainService {
 
     LOG.info("Created ContactEvent User A scanning User B:\n{}", writer.writeValueAsString(contactEventAB));
 
+    userScanned.send(contactEventAB);
+    userGotScanned.send(contactEventAB);
     /*
      * Location Event User C -> User D on 52.527467, 13.431369: User C scanning User D
      */
@@ -294,6 +312,9 @@ public class MainService {
 
     LOG.info("Created ContactEvent User C scanning User D:\n{}", writer.writeValueAsString(contactEventCD));
 
+    userScanned.send(contactEventCD);
+    userGotScanned.send(contactEventCD);
+
     final OffsetDateTime infectionTime = OffsetDateTime.now().plus(1, ChronoUnit.WEEKS);
     final Infection infection = this.infectionRepository.save(Infection.builder()
         .isInfected(true)
@@ -306,7 +327,8 @@ public class MainService {
     final Geocoord a = new Geocoord(48.16726, 11.49628);
     final Geocoord b = new Geocoord(48.16726, 11.49632);
 
-    this.locationEventRepository.save(LocationEvent.builder()
+
+    final LocationEvent locatedC =  this.locationEventRepository.save(LocationEvent.builder()
         .externalId(UUID.randomUUID().toString())
         .latitude(a.latitude())
         .longitude(a.longitude())
@@ -314,13 +336,16 @@ public class MainService {
         .userCreate(userC)
         .build());
 
-    this.locationEventRepository.save(LocationEvent.builder()
+    final LocationEvent locatedD = this.locationEventRepository.save(LocationEvent.builder()
         .externalId(UUID.randomUUID().toString())
         .latitude(b.latitude())
         .longitude(b.longitude())
         .name("B")
         .userCreate(userC)
         .build());
+
+    userLocated.send(locatedC);
+    userLocated.send(locatedD);
 
     final double distance = a.distanceTo(b); // in meters
 

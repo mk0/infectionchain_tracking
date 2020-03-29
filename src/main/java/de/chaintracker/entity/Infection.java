@@ -41,4 +41,8 @@ public class Infection {
 
   @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE", nullable = false, updatable = false)
   private OffsetDateTime timestamp;
+
+  public User getUser() {
+    return user;
+  }
 }

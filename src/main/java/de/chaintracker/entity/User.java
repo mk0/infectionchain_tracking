@@ -75,4 +75,28 @@ public class User {
     }
   }
 
+  public String getId() {
+    return id;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public String getFirstName() {
+    return firstName;
+  }
+
+  public String getLastName() {
+    return lastName;
+  }
+
+  public String getUserName() {
+    return userName;
+  }
+
+  public String getQrCode() {
+    return qrCode;
+  }
+
 }

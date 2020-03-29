@@ -63,4 +63,16 @@ public class LocationEvent {
     if (this.id == null)
       setTimestampCreate(OffsetDateTime.now());
   }
+
+  public Double getLatitude() {
+    return latitude;
+  }
+
+  public Double getLongitude() {
+    return longitude;
+  }
+
+  public User getUserCreate() {
+    return userCreate;
+  }
 }
