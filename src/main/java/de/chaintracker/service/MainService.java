@@ -6,9 +6,14 @@ package de.chaintracker.service;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
+
+import de.chaintracker.kafka.events.UserUpdated;
+import de.chaintracker.kafka.producers.UserProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,6 +38,7 @@ import de.chaintracker.util.Geocoord;
  *
  */
 @Service
+@SpringBootApplication(exclude = KafkaAutoConfiguration.class)
 public class MainService {
 
   private static final Logger LOG = LoggerFactory.getLogger(MainService.class);
@@ -57,6 +63,9 @@ public class MainService {
 
   @Autowired
   private ObjectMapper objectMapper;
+
+  @Autowired
+  private UserProducer userProducer;
 
   @EventListener
   public void onApplicationEvent(final ApplicationStartedEvent event) throws JsonProcessingException {
@@ -319,6 +328,11 @@ public class MainService {
             e.printStackTrace();
           }
         });
+
+    var update = new UserUpdated();
+    update.id = userA.getId();
+    update.email = userA.getEmail();
+    userProducer.userUpdated(update);
   }
 
 }
