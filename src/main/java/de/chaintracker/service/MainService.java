@@ -12,6 +12,8 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,6 +39,7 @@ import de.chaintracker.util.Geocoord;
  *
  */
 @Service
+@SpringBootApplication(exclude = KafkaAutoConfiguration.class)
 public class MainService {
 
   private static final Logger LOG = LoggerFactory.getLogger(MainService.class);
@@ -365,7 +368,6 @@ public class MainService {
             LOG.error(e.getMessage(), e);
           }
         });
-
 
     final int amount = 100000;
 

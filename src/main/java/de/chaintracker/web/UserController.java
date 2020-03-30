@@ -24,6 +24,8 @@ import de.chaintracker.dto.UserCreateDto;
 import de.chaintracker.dto.UserDto;
 import de.chaintracker.entity.User;
 import de.chaintracker.entity.UserAddress;
+import de.chaintracker.kafka.events.UserUpdated;
+import de.chaintracker.kafka.producers.UserUpdatedProducer;
 import de.chaintracker.repo.UserAddressRepository;
 import de.chaintracker.repo.UserRepository;
 import de.chaintracker.security.SecurityConstants;
@@ -53,6 +55,9 @@ public class UserController {
 
   @Value("${app.token.secret}")
   private String tokenSecret;
+
+  @Autowired
+  private UserUpdatedProducer userUpdatedProducer;
 
   @Secured
   @RequestMapping(method = RequestMethod.GET)
@@ -84,6 +89,14 @@ public class UserController {
         .build());
 
     // TODO: Email verification: Send email
+
+    this.userUpdatedProducer.userUpdated(UserUpdated.builder()
+        .email(user.getEmail())
+        .firstName(user.getFirstName())
+        .id(user.getId())
+        .lastName(user.getLastName())
+        .password(user.getEncryptedPassword())
+        .build());
 
     return user.getId();
   }
