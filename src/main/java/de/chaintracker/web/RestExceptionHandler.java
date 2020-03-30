@@ -30,9 +30,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     return ResponseEntity.badRequest().build();
   }
 
-  @ExceptionHandler(value = {IllegalStateException.class})
-  @ResponseStatus(HttpStatus.FORBIDDEN)
-  public ResponseEntity<String> forbidden(final Exception ex) {
-    return ResponseEntity.noContent().build();
-  }
+  // @ExceptionHandler(value = {IllegalStateException.class})
+  // @ResponseStatus(HttpStatus.FORBIDDEN)
+  // public ResponseEntity<String> forbidden(final Exception ex) {
+  // return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+  // }
 }

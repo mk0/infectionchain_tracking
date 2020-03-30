@@ -22,8 +22,8 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>de.chaintracker</groupId>
-			<artifactId>kafka-module</artifactId>
+			<groupId>one.tracking.framework</groupId>
+			<artifactId>kafka-module-boot</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 

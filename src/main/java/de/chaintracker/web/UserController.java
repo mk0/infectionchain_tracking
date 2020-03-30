@@ -67,7 +67,9 @@ public class UserController {
   }
 
   @RequestMapping(method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
-  public String createUser(final UserCreateDto userCreate) {
+  public String createUser(
+      @RequestBody
+      final UserCreateDto userCreate) {
 
     if (this.userRepository.existsByEmail(userCreate.getEmail()))
       throw new IllegalArgumentException("Email does already exist.");
