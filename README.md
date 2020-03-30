@@ -1,3 +1,7 @@
+# Continuation
+This project will be continued here:
+https://github.com/OneTrackingFramework
+
 # Infection Chain Backend
 
 This is the backend component of the Project Infection Chain (https://devpost.com/software/infection-chain).
